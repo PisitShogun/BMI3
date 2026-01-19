@@ -11,46 +11,51 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') || 'daily'; // daily, weekly, monthly, yearly
 
-    let groupByFormat;
+    let dateFormat;
     switch (period) {
       case 'weekly':
-        groupByFormat = '%Y-%W';
+        dateFormat = 'YYYY-IW'; // ISO Week
         break;
       case 'monthly':
-        groupByFormat = '%Y-%m';
+        dateFormat = 'YYYY-MM';
         break;
       case 'yearly':
-        groupByFormat = '%Y';
+        dateFormat = 'YYYY';
         break;
       case 'daily':
       default:
-        groupByFormat = '%Y-%m-%d';
+        dateFormat = 'YYYY-MM-DD';
         break;
     }
 
     // Get aggregated stats
-    const stats = db.prepare(`
+    // Note: In Vercel Postgres, we use standard PostgreSQL syntax.
+    // to_char is used for date formatting.
+    // AVG returns a float, we cast to numeric for rounding.
+    const { rows: stats } = await db`
       SELECT 
-        strftime('${groupByFormat}', created_at) as period,
+        to_char(created_at, ${dateFormat}) as period,
         COUNT(*) as count,
-        ROUND(AVG(bmi), 2) as avgBmi,
+        ROUND(AVG(bmi)::numeric, 2) as avgBmi,
         MIN(bmi) as minBmi,
         MAX(bmi) as maxBmi
       FROM records 
-      WHERE user_id = ?
+      WHERE user_id = ${userId}
       GROUP BY period
       ORDER BY period DESC
       LIMIT 30
-    `).all(userId);
+    `;
 
     // Get overall summary
-    const summary = db.prepare(`
+    const { rows: summaryRows } = await db`
       SELECT 
         COUNT(*) as totalRecords,
-        ROUND(AVG(bmi), 2) as overallAvgBmi
+        ROUND(AVG(bmi)::numeric, 2) as overallAvgBmi
       FROM records 
-      WHERE user_id = ?
-    `).get(userId);
+      WHERE user_id = ${userId}
+    `;
+    
+    const summary = summaryRows[0];
 
     return NextResponse.json({ stats, summary }, { status: 200 });
   } catch (error) {

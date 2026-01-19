@@ -14,8 +14,8 @@ export async function POST(request: Request) {
     }
 
     // Check if user already exists
-    const existingUser = db.prepare('SELECT * FROM users WHERE username = ?').get(username);
-    if (existingUser) {
+    const { rows: existingUsers } = await db`SELECT * FROM users WHERE username = ${username}`;
+    if (existingUsers.length > 0) {
       return NextResponse.json(
         { error: 'Username already exists' },
         { status: 409 }
@@ -26,11 +26,14 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Insert user
-    const stmt = db.prepare('INSERT INTO users (username, password) VALUES (?, ?)');
-    const info = stmt.run(username, hashedPassword);
-
+    const { rows: newUsers } = await db`
+      INSERT INTO users (username, password) 
+      VALUES (${username}, ${hashedPassword}) 
+      RETURNING id
+    `;
+    
     return NextResponse.json(
-      { message: 'User created successfully', userId: info.lastInsertRowid },
+      { message: 'User created successfully', userId: newUsers[0].id },
       { status: 201 }
     );
   } catch (error) {

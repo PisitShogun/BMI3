@@ -1,7 +1,3 @@
-import Database from 'better-sqlite3';
-import path from 'path';
+import { sql } from '@vercel/postgres';
 
-const dbPath = path.join(process.cwd(), 'bmi.db');
-const db = new Database(dbPath);
-
-export default db;
+export default sql;

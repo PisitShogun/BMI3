@@ -9,9 +9,9 @@ export async function GET(request: Request) {
     }
 
     // Get recent 10 records
-    const records = db.prepare(
-      'SELECT * FROM records WHERE user_id = ? ORDER BY created_at DESC LIMIT 10'
-    ).all(userId);
+    const { rows: records } = await db`
+      SELECT * FROM records WHERE user_id = ${userId} ORDER BY created_at DESC LIMIT 10
+    `;
 
     return NextResponse.json(records, { status: 200 });
   } catch (error) {

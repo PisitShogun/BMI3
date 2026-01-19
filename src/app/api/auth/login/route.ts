@@ -19,7 +19,9 @@ export async function POST(request: Request) {
     }
 
     // Find user
-    const user = db.prepare('SELECT * FROM users WHERE username = ?').get(username) as any;
+    const { rows } = await db`SELECT * FROM users WHERE username = ${username}`;
+    const user = rows[0] as any;
+    
     if (!user) {
       return NextResponse.json(
         { error: 'Invalid credentials' },

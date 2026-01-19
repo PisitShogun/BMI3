@@ -22,15 +22,17 @@ export async function POST(request: Request) {
     const bmi = parseFloat((weight / (heightInMeters * heightInMeters)).toFixed(2));
 
     // Save to database
-    const stmt = db.prepare(
-      'INSERT INTO records (user_id, weight, height, bmi) VALUES (?, ?, ?, ?)'
-    );
-    const info = stmt.run(userId, weight, height, bmi);
+    const { rows } = await db`
+      INSERT INTO records (user_id, weight, height, bmi) 
+      VALUES (${userId}, ${weight}, ${height}, ${bmi}) 
+      RETURNING id
+    `;
+    const id = rows[0].id;
 
     return NextResponse.json(
       { 
         message: 'Record saved successfully', 
-        id: info.lastInsertRowid,
+        id: id,
         bmi 
       },
       { status: 201 }
