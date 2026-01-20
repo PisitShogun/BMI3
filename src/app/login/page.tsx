@@ -42,6 +42,7 @@ export default function LoginPage() {
             <label className="block text-sm font-medium">Username</label>
             <input
               type="text"
+              name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -52,6 +53,7 @@ export default function LoginPage() {
             <label className="block text-sm font-medium">Password</label>
             <input
               type="password"
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required

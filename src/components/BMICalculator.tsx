@@ -59,6 +59,7 @@ export default function BMICalculator({ onCalculate }: { onCalculate: () => void
           <label className="block text-sm font-medium mb-1">Weight (kg)</label>
           <input
             type="number"
+            name="weight"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
             required
@@ -71,6 +72,7 @@ export default function BMICalculator({ onCalculate }: { onCalculate: () => void
           <label className="block text-sm font-medium mb-1">Height (cm)</label>
           <input
             type="number"
+            name="height"
             value={height}
             onChange={(e) => setHeight(e.target.value)}
             required

@@ -42,6 +42,7 @@ export default function RegisterPage() {
             <label className="block text-sm font-medium">Username</label>
             <input
               type="text"
+              name="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -52,6 +53,7 @@ export default function RegisterPage() {
             <label className="block text-sm font-medium">Password</label>
             <input
               type="password"
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -69,6 +71,11 @@ export default function RegisterPage() {
           <Link href="/login" className="text-blue-500 hover:underline">
             Already have an account? Login
           </Link>
+          <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-md text-sm text-left">
+            <p className="font-semibold mb-2">Demo Credentials:</p>
+            <p>Username: <span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">test@example.com</span></p>
+            <p>Password: <span className="font-mono bg-gray-200 dark:bg-gray-600 px-1 rounded">123456789</span></p>
+          </div>
         </div>
       </div>
     </div>
